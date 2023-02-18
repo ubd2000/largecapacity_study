@@ -1,4 +1,4 @@
-package com.example.fastcampusmysql.domain.member.util;
+package com.example.fastcampusmysql.util;
 
 import com.example.fastcampusmysql.domain.member.entity.Member;
 import org.jeasy.random.EasyRandom;
