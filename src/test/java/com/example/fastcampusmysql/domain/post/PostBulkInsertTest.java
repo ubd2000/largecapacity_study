@@ -23,7 +23,7 @@ public class PostBulkInsertTest {
     public void bulkInsert() {
         var easyReandom = PostFixtureFactory.get(
                 3L,
-                LocalDate.of(2022, 1, 1),
+                LocalDate.of(1970, 1, 1),
                 LocalDate.of(2022, 2, 1)
         );
 

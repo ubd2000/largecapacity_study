@@ -19,6 +19,11 @@ public class FollowReadService {
         return toDto(follows);
     }
 
+    public List<FollowDto> getFollowers(Long memberId) {
+        List<Follow> follows = followRepository.findAllByToMemberId(memberId);
+        return toDto(follows);
+    }
+
     private List<FollowDto> toDto(List<Follow> follows) {
         List<FollowDto> followDtos = new ArrayList<>();
         for (Follow follow : follows) {
