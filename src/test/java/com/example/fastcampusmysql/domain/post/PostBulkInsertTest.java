@@ -31,7 +31,7 @@ public class PostBulkInsertTest {
         stopWatch.start();
 
         int _1만 = 10000;
-        var posts = IntStream.range(0, _1만 * 100)
+        var posts = IntStream.range(0, _1만 * 500)
                 .parallel()
                 .mapToObj(i -> easyReandom.nextObject(Post.class))
                 .toList();
@@ -44,7 +44,7 @@ public class PostBulkInsertTest {
         postRepository.bulkInsert(posts);
 
         stopWatch.stop();
-        System.out.println("객체 생성 시간 : " +  stopWatch.getTotalTimeSeconds());
+        System.out.println("DB 인서트 시간 : " +  stopWatch.getTotalTimeSeconds());
 
     }
 }

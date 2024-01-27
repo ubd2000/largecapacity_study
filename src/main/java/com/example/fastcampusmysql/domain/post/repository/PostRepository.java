@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author love_
@@ -38,6 +39,8 @@ public class PostRepository {
             .contents(resultSet.getString("contents"))
             .createdDate(resultSet.getObject("createdDate", LocalDate.class))
             .createdAt(resultSet.getObject("createdAt", LocalDateTime.class))
+            .likeCount(resultSet.getLong("likeCount"))
+            .version(resultSet.getLong("version"))
             .build();
 
     final static private RowMapper<DailyPostCount> DAILY_POST_COUNT_MAPPER = (ResultSet resultSet, int rowNum)
@@ -76,6 +79,16 @@ public class PostRepository {
 
         var posts = namedParameterJdbcTemplate.query(sql, params, ROW_MAPPER);
         return new PageImpl(posts, pageable, getCount(memberId));
+    }
+
+    public Optional<Post> findById(Long postId, Boolean requiredLock) {
+        var sql = String.format("SELECT * FROM %s WHERE id = :postId ", TABLE);
+        if (requiredLock) {
+            sql += "FOR UPDATE";
+        }
+        var params = new MapSqlParameterSource().addValue("postId", postId);
+        var nullablePost =  namedParameterJdbcTemplate.queryForObject(sql, params, ROW_MAPPER);
+        return Optional.ofNullable(nullablePost);
     }
 
     private Long getCount(Long memberId) {
@@ -175,7 +188,15 @@ public class PostRepository {
         if (post.getId() == null) {
             return insert(post);
         } else {
-            throw new UnsupportedOperationException("Post는 갱신을 지원하지 않습니다");
+            return update_v2(post);
+        }
+    }
+
+    public Post save_v1(Post post) {
+        if (post.getId() == null) {
+            return insert(post);
+        } else {
+            return update_v1(post);
         }
     }
 
@@ -208,5 +229,46 @@ public class PostRepository {
                 .createdDate(post.getCreatedDate())
                 .createdAt(post.getCreatedAt())
                 .build();
+    }
+
+    private Post update_v1(Post post) {
+        var sql = String.format("""
+                        UPDATE %s SET
+                            memberId = :memberId,
+                            contents = :contents,
+                            createdDate = :createdDate,
+                            createdAt = :createdAt,
+                            likeCount = :likeCount
+                        WHERE id = :id
+                        """, TABLE);
+        SqlParameterSource param = new BeanPropertySqlParameterSource(post);
+        var updateCount = namedParameterJdbcTemplate.update(sql, param);
+
+        if (updateCount == 0) {
+            throw new RuntimeException("갱신 실패");
+        }
+
+        return post;
+    }
+
+    private Post update_v2(Post post) {
+        var sql = String.format("""
+                        UPDATE %s SET
+                            memberId = :memberId,
+                            contents = :contents,
+                            createdDate = :createdDate,
+                            createdAt = :createdAt,
+                            likeCount = :likeCount,
+                            version = :version + 1
+                        WHERE id = :id and version = :version
+                        """, TABLE);
+        SqlParameterSource param = new BeanPropertySqlParameterSource(post);
+        var updateCount = namedParameterJdbcTemplate.update(sql, param);
+
+        if (updateCount == 0) {
+            throw new RuntimeException("갱신 실패");
+        }
+
+        return post;
     }
 }

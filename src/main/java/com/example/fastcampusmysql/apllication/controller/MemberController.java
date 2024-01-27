@@ -3,6 +3,7 @@ package com.example.fastcampusmysql.apllication.controller;
 import com.example.fastcampusmysql.domain.member.dto.MemberDto;
 import com.example.fastcampusmysql.domain.member.dto.MemberNicknameHistoryDto;
 import com.example.fastcampusmysql.domain.member.dto.RegisterMemberCommand;
+import com.example.fastcampusmysql.domain.member.dto.TestDto;
 import com.example.fastcampusmysql.domain.member.service.MemberReadService;
 import com.example.fastcampusmysql.domain.member.service.MemberWriteService;
 import lombok.RequiredArgsConstructor;

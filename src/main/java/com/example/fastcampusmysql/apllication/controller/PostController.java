@@ -1,5 +1,6 @@
 package com.example.fastcampusmysql.apllication.controller;
 
+import com.example.fastcampusmysql.apllication.usecase.CreatePostLikeUsacase;
 import com.example.fastcampusmysql.apllication.usecase.CreatePostUsecase;
 import com.example.fastcampusmysql.apllication.usecase.GetTimelinePostUsecase;
 import com.example.fastcampusmysql.domain.post.dto.DailyPostCount;
@@ -28,6 +29,7 @@ public class PostController {
     final private PostReadService postReadService;
     final private GetTimelinePostUsecase getTimelinePostUsecase;
     final private CreatePostUsecase createPostUsecase;
+    final private CreatePostLikeUsacase createPostLikeUsacase;
 
     @PostMapping("")
     public Long create(PostCommand command) {
@@ -52,5 +54,17 @@ public class PostController {
     @GetMapping("/members/{memberId}/timeline")
     public PageCursor<Post> getTimeline(@PathVariable Long memberId, CursorRequest cursorRequest) {
         return getTimelinePostUsecase.executeByTimeline(memberId, cursorRequest);
+    }
+
+    @PostMapping("/{postId}/like/v1")
+    public void likePost(@PathVariable Long postId) {
+        postWriteService.likePost(postId);
+//        postWriteService.likePostByOptimisticLock(postId);
+    }
+
+    @PostMapping("/{postId}/like/v2")
+    public void likePostV2(@PathVariable Long postId) {
+//        postWriteService.likePost(postId);
+        postWriteService.likePostByOptimisticLock(postId);
     }
 }

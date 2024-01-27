@@ -8,6 +8,7 @@ import com.example.fastcampusmysql.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author love_
@@ -28,6 +29,7 @@ public class MemberWriteService {
             val member = Member.of(memberRegisterCommand)
             memberRepository.save(member)
          */
+
         var member = Member.builder()
                 .nickname(command.nickname())
                 .email(command.email())
